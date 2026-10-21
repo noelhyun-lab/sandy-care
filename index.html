@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandy's Daily Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f2e9;
+    --paper-2:#fffdf8;
+    --ink:#2c352b;
+    --ink-soft:#5b6557;
+    --line:#e2dac9;
+    --sage:#7c8a6b;
+    --sage-deep:#5f6e51;
+    --clay:#bd744c;
+    --clay-soft:#f0d9cb;
+    --alert:#b3492f;
+    --alert-bg:#f8e4dd;
+    --shadow:0 1px 2px rgba(54,48,33,.05), 0 8px 24px -12px rgba(54,48,33,.22);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, #efe8d8 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #ece4d2 0%, transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Hanken Grotesk',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 18px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header.top{
+    margin-bottom:22px;
+  }
+  .eyebrow{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--clay);font-weight:600;margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(30px,6vw,44px);line-height:1.05;
+    margin:0 0 6px;letter-spacing:-.01em;
+  }
+  .sub{color:var(--ink-soft);font-size:15px;max-width:52ch;}
+  .who{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
+  }
+  .who label{
+    display:flex;flex-direction:column;gap:3px;font-size:12px;
+    letter-spacing:.04em;color:var(--ink-soft);font-weight:600;text-transform:uppercase;
+  }
+  .who input{
+    font-family:'Hanken Grotesk';font-size:15px;font-weight:600;color:var(--ink);
+    border:1px solid var(--line);background:var(--paper-2);
+    border-radius:10px;padding:9px 12px;min-width:150px;
+  }
+  .card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 20px 22px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+  }
+  .card h2{
+    font-family:'Fraunces',serif;font-weight:500;font-size:21px;
+    margin:0 0 2px;display:flex;align-items:center;gap:9px;
+  }
+  .card h2 .ic{
+    width:26px;height:26px;flex:none;border-radius:8px;background:var(--clay-soft);
+    display:grid;place-items:center;color:var(--clay);font-size:14px;
+  }
+  .card .hint{font-size:13px;color:var(--ink-soft);margin:0 0 16px;}
+  .shiftbar{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .shiftbar .datebox{display:flex;flex-direction:column;gap:4px;}
+  .shiftbar label{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;}
+  input[type=date]{
+    font-family:'Hanken Grotesk';font-size:16px;font-weight:600;color:var(--ink);
+    border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;
+  }
+  .shiftpill{
+    text-align:right;
+  }
+  .shiftpill .day{font-family:'Fraunces',serif;font-size:20px;}
+  .shiftpill .hours{
+    display:inline-block;margin-top:4px;font-size:13px;font-weight:600;
+    padding:5px 12px;border-radius:999px;background:var(--sage);color:#fff;letter-spacing:.02em;
+  }
+  .shiftpill .hours.half{background:var(--clay);}
+  .shiftpill .hours.off{background:#aab09e;}
+
+  .row{display:flex;flex-wrap:wrap;gap:10px 14px;}
+  .field{flex:1 1 220px;min-width:0;}
+  .field.full{flex-basis:100%;}
+  .field > span.lbl{
+    display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;
+  }
+  textarea,select,input[type=text],input[type=number],input[type=time]{
+    width:100%;font-family:'Hanken Grotesk';font-size:15px;color:var(--ink);
+    border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;
+    resize:vertical;
+  }
+  .hoursline{margin-top:14px;font-weight:700;font-size:15px;color:var(--sage-deep);}
+  textarea{min-height:62px;}
+  textarea::placeholder,input::placeholder{color:#a7a896;}
+
+  /* care task rows */
+  .task{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:11px 0;border-bottom:1px dashed var(--line);
+  }
+  .task:last-of-type{border-bottom:none;}
+  .task .name{flex:1 1 150px;font-weight:600;font-size:15px;}
+  .seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);}
+  .seg button{
+    font-family:'Hanken Grotesk';font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    border:none;background:transparent;padding:8px 12px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .seg button:not(:last-child){border-right:1px solid var(--line);}
+  .seg button.on{color:#fff;}
+  .seg button.on[data-v="Independent"]{background:#7c8a6b;}
+  .seg button.on[data-v="Reminders"]{background:#9a9a52;}
+  .seg button.on[data-v="Some help"]{background:#d39a52;color:#3a2c18;}
+  .seg button.on[data-v="Full help"]{background:#bd744c;}
+  .seg button.on[data-v="Declined"]{background:#9aa08e;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 16px;font-size:12.5px;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    font-family:'Hanken Grotesk';font-size:14px;font-weight:600;color:var(--ink-soft);
+    border:1px solid var(--line);background:var(--paper);border-radius:999px;
+    padding:8px 14px;cursor:pointer;transition:.15s;user-select:none;
+  }
+  .chip:hover{border-color:var(--sage);}
+  .chip.on{background:var(--sage-deep);color:#fff;border-color:var(--sage-deep);}
+  .chip.mood.on{background:var(--clay);border-color:var(--clay);}
+
+  /* incident */
+  .incident-toggle{display:flex;gap:10px;margin-bottom:4px;}
+  .bigtoggle{
+    flex:1;text-align:center;font-family:'Hanken Grotesk';font-weight:700;font-size:15px;
+    border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:13px;cursor:pointer;transition:.15s;
+  }
+  .bigtoggle.on-no{background:var(--sage);color:#fff;border-color:var(--sage);}
+  .bigtoggle.on-yes{background:var(--alert);color:#fff;border-color:var(--alert);}
+  #incidentDetail{margin-top:12px;display:none;}
+  #incidentDetail.show{display:block;}
+  .card.flagged{border-color:var(--alert);background:var(--alert-bg);}
+
+  .meds-foot{margin-top:10px;}
+
+  /* actions */
+  .actions{
+    position:sticky;bottom:0;display:flex;gap:12px;flex-wrap:wrap;
+    padding-top:8px;
+  }
+  .btn{
+    font-family:'Hanken Grotesk';font-weight:700;font-size:15px;cursor:pointer;
+    border-radius:12px;padding:14px 22px;border:1.5px solid transparent;transition:.15s;
+  }
+  .btn.primary{background:var(--ink);color:var(--paper);flex:1;box-shadow:var(--shadow);}
+  .btn.primary:hover{background:#3a4638;}
+  .btn.ghost{background:var(--paper-2);color:var(--ink);border-color:var(--line);}
+  .btn.ghost:hover{border-color:var(--sage);}
+
+  /* report output */
+  .report{
+    margin-top:20px;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:18px;padding:22px;box-shadow:var(--shadow);display:none;
+  }
+  .report.show{display:block;}
+  .report h3{font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin:0 0 12px;}
+  .report pre{
+    font-family:'Hanken Grotesk';font-size:14.5px;line-height:1.6;color:var(--ink);
+    white-space:pre-wrap;background:var(--paper);border:1px dashed var(--line);
+    border-radius:12px;padding:16px;margin:0 0 14px;
+  }
+  .report .rowbtns{display:flex;gap:10px;flex-wrap:wrap;}
+  .copied{color:var(--sage-deep);font-weight:700;font-size:14px;align-self:center;display:none;}
+  .copied.show{display:inline;}
+
+  /* history */
+  details.hist{margin-top:18px;}
+  details.hist summary{
+    cursor:pointer;font-weight:700;color:var(--ink-soft);font-size:14px;
+    list-style:none;padding:6px 0;
+  }
+  details.hist summary::-webkit-details-marker{display:none;}
+  details.hist summary::before{content:"▸ ";color:var(--clay);}
+  details.hist[open] summary::before{content:"▾ ";}
+  .histitem{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-top:8px;background:var(--paper-2);
+  }
+  .histitem .hd{font-weight:600;font-size:14px;}
+  .histitem button{
+    font-family:'Hanken Grotesk';font-weight:600;font-size:13px;cursor:pointer;
+    background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--ink);
+  }
+  .histitem button:hover{border-color:var(--sage);}
+  .emptyhist{font-size:13px;color:var(--ink-soft);padding:8px 0;}
+  .foot{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Daily Care Report</div>
+    <h1>End-of-Day Notes</h1>
+    <p class="sub">A quick wrap-up to send at the end of each shift. Fill in what applies, leave the rest blank, then generate a tidy summary to text or email.</p>
+    <div class="who">
+      <label>Care recipient
+        <input type="text" id="recipient" value="Sandy">
+      </label>
+      <label>Caregiver
+        <input type="text" id="caregiver" value="Tess">
+      </label>
+    </div>
+  </header>
+
+  <!-- Date & shift -->
+  <section class="card">
+    <div class="shiftbar">
+      <div class="datebox">
+        <label for="date">Date</label>
+        <input type="date" id="date">
+      </div>
+      <div class="shiftpill">
+        <div class="day" id="dayName">—</div>
+        <span class="hours" id="hours">—</span>
+      </div>
+    </div>
+    <p class="hint" style="margin:16px 0 10px;">Actual times worked and miles driven — used for the Friday timecard. Pre-filled from the schedule; adjust if the day ran differently.</p>
+    <div class="row">
+      <div class="field">
+        <span class="lbl">Start time</span>
+        <input type="time" id="startTime">
+      </div>
+      <div class="field">
+        <span class="lbl">End time</span>
+        <input type="time" id="endTime">
+      </div>
+      <div class="field">
+        <span class="lbl">Miles driven</span>
+        <input type="number" id="miles" min="0" step="1" placeholder="0">
+      </div>
+    </div>
+    <div class="hoursline" id="hoursWorked">Hours worked: —</div>
+  </section>
+
+  <!-- Email recipients -->
+  <section class="card">
+    <h2><span class="ic">@</span>Send report to</h2>
+    <p class="hint">The daily report emails to this address. Saved on this device.</p>
+    <div class="row">
+      <div class="field">
+        <span class="lbl">Send to</span>
+        <input type="text" id="emailYou" value="noelhyun@gmail.com" placeholder="you@example.com">
+      </div>
+    </div>
+  </section>
+
+  <!-- Personal care -->
+  <section class="card">
+    <h2><span class="ic">✦</span>Personal care &amp; grooming</h2>
+    <p class="hint">Rate how much help each task needed today. Tracking this over time helps spot gradual changes. Leave blank if it didn't come up.</p>
+    <div class="legend">
+      <span><i style="background:#7c8a6b"></i>Independent — did it on her own</span>
+      <span><i style="background:#9a9a52"></i>Reminders — needed verbal cues</span>
+      <span><i style="background:#d39a52"></i>Some help — partial hands-on</span>
+      <span><i style="background:#bd744c"></i>Full help — done for her</span>
+      <span><i style="background:#9aa08e"></i>Declined</span>
+    </div>
+    <div id="tasks"></div>
+    <div class="field full" style="margin-top:14px;">
+      <span class="lbl">Grooming notes <span style="font-weight:400;color:var(--ink-soft);">(e.g. started re-dressing, what helped redirect)</span></span>
+      <textarea id="groomNotes" placeholder="Optional"></textarea>
+    </div>
+  </section>
+
+  <!-- Meals -->
+  <section class="card">
+    <h2><span class="ic">❀</span>Meals &amp; hydration</h2>
+    <p class="hint">Jot down what she ate and drank, and how her appetite seemed.</p>
+    <div class="field full">
+      <textarea id="mealNotes" style="min-height:110px;" placeholder="e.g. Breakfast: oatmeal & banana, ate most of it.&#10;Lunch: soup and half a sandwich.&#10;Drank about 5 glasses of water through the day — needed reminding.&#10;Good appetite today."></textarea>
+    </div>
+  </section>
+
+  <!-- Mood -->
+  <section class="card">
+    <h2><span class="ic">☺</span>Mood &amp; behavior</h2>
+    <p class="hint">Tap any that fit. Worth noting if mood shifts in the late afternoon.</p>
+    <div class="chips" id="moodChips"></div>
+    <div class="field full" style="margin-top:14px;">
+      <span class="lbl">Notes</span>
+      <textarea id="moodNotes" placeholder="Optional"></textarea>
+    </div>
+  </section>
+
+  <!-- Activities -->
+  <section class="card">
+    <h2><span class="ic">✿</span>Activities &amp; engagement</h2>
+    <div class="chips" id="actChips"></div>
+    <div class="field full" style="margin-top:14px;">
+      <span class="lbl">Rest / naps</span>
+      <input type="text" id="rest" placeholder="e.g. napped ~1 hr after lunch">
+    </div>
+    <div class="field full" style="margin-top:12px;">
+      <span class="lbl">Activity notes</span>
+      <textarea id="actNotes" style="min-height:110px;" placeholder="How she engaged, what she enjoyed, anything that went well or didn't"></textarea>
+    </div>
+  </section>
+
+  <!-- Staying connected -->
+  <section class="card">
+    <h2><span class="ic">☎</span>Staying connected</h2>
+    <p class="hint">Helping her stay in touch with family and friends — checking her phone, photos, calls, messages.</p>
+    <div class="chips" id="connectChips"></div>
+    <div class="field full" style="margin-top:14px;">
+      <span class="lbl">Notes <span style="font-weight:400;color:var(--ink-soft);">(who she heard from, photos she enjoyed, anything to follow up on)</span></span>
+      <textarea id="connectNotes" placeholder="e.g. Looked through photos from the grandkids and smiled. Missed a call from her sister — might be nice to call back."></textarea>
+    </div>
+  </section>
+
+  <!-- Incident -->
+  <section class="card" id="incidentCard">
+    <h2><span class="ic">!</span>Safety &amp; incidents</h2>
+    <p class="hint">Anything to flag — falls, near-falls, wandering, confusion that needed help.</p>
+    <div class="incident-toggle">
+      <div class="bigtoggle on-no" id="incNo">No incidents today</div>
+      <div class="bigtoggle" id="incYes">Something to report</div>
+    </div>
+    <div id="incidentDetail">
+      <div class="field full">
+        <span class="lbl">What happened</span>
+        <textarea id="incidentText" placeholder="Describe what happened and how it was handled"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- Health & supplies -->
+  <section class="card">
+    <h2><span class="ic">♡</span>Health &amp; supplies</h2>
+    <div class="field full">
+      <span class="lbl">Anything new physically <span style="font-weight:400;color:var(--ink-soft);">(skin, bruising, pain, appetite change)</span></span>
+      <textarea id="health" placeholder="Optional"></textarea>
+    </div>
+    <div class="field full" style="margin-top:12px;">
+      <span class="lbl">Supplies running low</span>
+      <input type="text" id="supplies" placeholder="Optional — e.g. running low on incontinence pads">
+    </div>
+    <div class="field full" style="margin-top:12px;">
+      <span class="lbl">Anything else for the family</span>
+      <textarea id="summary" placeholder="Optional — overall how the day went"></textarea>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn primary" id="generate">Generate report</button>
+    <button class="btn ghost" id="reset">Clear form</button>
+  </div>
+
+  <!-- Output -->
+  <div class="report" id="reportBox">
+    <h3>Today's report</h3>
+    <pre id="reportText"></pre>
+    <div class="rowbtns">
+      <button class="btn ghost" id="copyBtn">Copy to clipboard</button>
+      <button class="btn ghost" id="emailBtn">Email report</button>
+      <span class="copied" id="copiedMsg">Copied ✓</span>
+    </div>
+  </div>
+
+  <details class="hist">
+    <summary>Past reports</summary>
+    <div id="histList"><div class="emptyhist">Saved reports will appear here after you generate one.</div></div>
+  </details>
+
+  <p class="foot">Fill in what's relevant — blank fields are skipped. Tip: bookmark or save this page so it's ready each day.</p>
+</div>
+
+<script>
+(function(){
+  // ---------- shift schedule ----------
+  // 0 Sun ... 6 Sat
+  const SCHEDULE = {
+    1:{label:"7:00am – 3:00pm",type:"full"},
+    2:{label:"7:00am – 11:00am",type:"half"},
+    3:{label:"7:00am – 3:00pm",type:"full"},
+    4:{label:"7:00am – 11:00am",type:"half"},
+    5:{label:"7:00am – 3:00pm",type:"full"}
+  };
+  const DAYNAMES=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  const dateEl=document.getElementById('date');
+  const dayNameEl=document.getElementById('dayName');
+  const hoursEl=document.getElementById('hours');
+  const startEl=document.getElementById('startTime');
+  const endEl=document.getElementById('endTime');
+  const hoursWorkedEl=document.getElementById('hoursWorked');
+
+  function parseDate(v){ // avoid TZ shift
+    const [y,m,d]=v.split('-').map(Number);
+    return new Date(y,m-1,d);
+  }
+  function fmtToday(){
+    const t=new Date();
+    return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  }
+  function timeToMin(t){ if(!t) return null; const p=t.split(':'); return (+p[0])*60+(+p[1]); }
+  function calcHours(s,e){ const a=timeToMin(s),b=timeToMin(e); if(a==null||b==null||b<=a) return null; return (b-a)/60; }
+  function fmt12(t){
+    if(!t) return '';
+    let [h,m]=t.split(':').map(Number);
+    const ap=h>=12?'PM':'AM'; let hh=h%12; if(hh===0) hh=12;
+    return hh+':'+String(m).padStart(2,'0')+' '+ap;
+  }
+  function refreshHours(){
+    const h=calcHours(startEl.value,endEl.value);
+    hoursWorkedEl.textContent='Hours worked: '+(h==null?'—':h.toFixed(2)+' hrs');
+  }
+  function updateShift(){
+    const d=parseDate(dateEl.value);
+    const dow=d.getDay();
+    dayNameEl.textContent=DAYNAMES[dow];
+    const s=SCHEDULE[dow];
+    if(s){
+      hoursEl.textContent=s.label;
+      hoursEl.className='hours'+(s.type==='half'?' half':'');
+      startEl.value='07:00';
+      endEl.value = s.type==='half' ? '11:00' : '15:00';
+    }else{
+      hoursEl.textContent='No scheduled shift';
+      hoursEl.className='hours off';
+      startEl.value='';
+      endEl.value='';
+    }
+    refreshHours();
+  }
+  dateEl.value=fmtToday();
+  dateEl.addEventListener('change',updateShift);
+  startEl.addEventListener('change',refreshHours);
+  endEl.addEventListener('change',refreshHours);
+  updateShift();
+
+  // ---------- personal care tasks ----------
+  const TASKS=["Washed / bathed","Brushed teeth","Hair / grooming","Dressed for the day","Toileting"];
+  const tasksEl=document.getElementById('tasks');
+  const taskState={};
+  TASKS.forEach((t,i)=>{
+    taskState[t]='';
+    const row=document.createElement('div');
+    row.className='task';
+    const name=document.createElement('div');
+    name.className='name';name.textContent=t;
+    const seg=document.createElement('div');
+    seg.className='seg';
+    ["Independent","Reminders","Some help","Full help","Declined"].forEach(v=>{
+      const b=document.createElement('button');
+      b.textContent=v;b.dataset.v=v;
+      b.addEventListener('click',()=>{
+        const already=taskState[t]===v;
+        seg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+        if(already){taskState[t]='';}
+        else{b.classList.add('on');taskState[t]=v;}
+      });
+      seg.appendChild(b);
+    });
+    row.appendChild(name);row.appendChild(seg);
+    tasksEl.appendChild(row);
+  });
+
+  // ---------- chips ----------
+  function buildChips(containerId,items,extraClass){
+    const c=document.getElementById(containerId);
+    const sel=new Set();
+    items.forEach(it=>{
+      const el=document.createElement('div');
+      el.className='chip'+(extraClass?(' '+extraClass):'');
+      el.textContent=it;
+      el.addEventListener('click',()=>{
+        if(sel.has(it)){sel.delete(it);el.classList.remove('on');}
+        else{sel.add(it);el.classList.add('on');}
+      });
+      c.appendChild(el);
+    });
+    return sel;
+  }
+  const moodSel=buildChips('moodChips',
+    ["Calm","Content","Cheerful","Talkative","Anxious","Agitated","Confused","Restless","Tearful","Withdrawn","Sundowning (late day)"],'mood');
+  const actSel=buildChips('actChips',
+    ["Walk / outside","TV / music","Puzzle / game","Conversation","Looked at photos","Visitors","Quiet rest"]);
+  const connectSel=buildChips('connectChips',
+    ["Checked her phone","Saw family photos","Phone or video call","Texts / messages","Helped her reply","Reached out to someone"]);
+
+  // ---------- incident ----------
+  const incNo=document.getElementById('incNo');
+  const incYes=document.getElementById('incYes');
+  const incDetail=document.getElementById('incidentDetail');
+  const incCard=document.getElementById('incidentCard');
+  let incState='no';
+  function setInc(v){
+    incState=v;
+    incNo.classList.toggle('on-no',v==='no');
+    incYes.classList.toggle('on-yes',v==='yes');
+    incDetail.classList.toggle('show',v==='yes');
+    incCard.classList.toggle('flagged',v==='yes');
+  }
+  incNo.addEventListener('click',()=>setInc('no'));
+  incYes.addEventListener('click',()=>setInc('yes'));
+
+  // ---------- generate ----------
+  const $=id=>document.getElementById(id);
+  function line(label,val){ return val? (label+': '+val+'\n') : ''; }
+
+  function buildReport(){
+    const d=parseDate(dateEl.value);
+    const dow=d.getDay();
+    const s=SCHEDULE[dow];
+    const dateStr=DAYNAMES[dow]+', '+d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const recipient=$('recipient').value.trim()||'Sandy';
+    const caregiver=$('caregiver').value.trim()||'Tess';
+
+    let r='Daily Care Report — '+recipient+'\n';
+    r+=dateStr+'\n';
+    const st=startEl.value, et=endEl.value;
+    if(st&&et){ r+='Time worked: '+fmt12(st)+' – '+fmt12(et)+'\n'; }
+    const hrs=calcHours(st,et);
+    r+='Hours: '+(hrs!=null?hrs.toFixed(2):'0')+'\n';
+    r+='Miles: '+($('miles').value.trim()||'0')+'\n';
+    r+='────────────────────\n\n';
+
+    // personal care
+    const careLines=TASKS.filter(t=>taskState[t]).map(t=>'  • '+t+': '+taskState[t]);
+    if(careLines.length){ r+='PERSONAL CARE\n'+careLines.join('\n')+'\n'; }
+    if($('groomNotes').value.trim()) r+='  Notes: '+$('groomNotes').value.trim()+'\n';
+    if(careLines.length||$('groomNotes').value.trim()) r+='\n';
+
+    // meals
+    if($('mealNotes').value.trim()){
+      r+='MEALS & HYDRATION\n  '+$('mealNotes').value.trim()+'\n\n';
+    }
+
+    // mood
+    if(moodSel.size||$('moodNotes').value.trim()){
+      r+='MOOD & BEHAVIOR\n';
+      if(moodSel.size) r+='  '+[...moodSel].join(', ')+'\n';
+      if($('moodNotes').value.trim()) r+='  Notes: '+$('moodNotes').value.trim()+'\n';
+      r+='\n';
+    }
+
+    // activities
+    if(actSel.size||$('rest').value.trim()||$('actNotes').value.trim()){
+      r+='ACTIVITIES & REST\n';
+      if(actSel.size) r+='  '+[...actSel].join(', ')+'\n';
+      if($('rest').value.trim()) r+='  Rest: '+$('rest').value.trim()+'\n';
+      if($('actNotes').value.trim()) r+='  Notes: '+$('actNotes').value.trim()+'\n';
+      r+='\n';
+    }
+
+    // staying connected
+    if(connectSel.size||$('connectNotes').value.trim()){
+      r+='STAYING CONNECTED\n';
+      if(connectSel.size) r+='  '+[...connectSel].join(', ')+'\n';
+      if($('connectNotes').value.trim()) r+='  Notes: '+$('connectNotes').value.trim()+'\n';
+      r+='\n';
+    }
+
+    // incident
+    if(incState==='yes' && $('incidentText').value.trim()){
+      r+='⚠ INCIDENT TO NOTE\n  '+$('incidentText').value.trim()+'\n\n';
+    } else {
+      r+='Safety: No incidents today.\n\n';
+    }
+
+    // health & supplies
+    let hs='';
+    hs+=line('  Health',$('health').value.trim());
+    hs+=line('  Supplies needed',$('supplies').value.trim());
+    if(hs){ r+='HEALTH & SUPPLIES\n'+hs+'\n'; }
+
+    if($('summary').value.trim()){ r+='SUMMARY\n  '+$('summary').value.trim()+'\n\n'; }
+
+    r+='— '+caregiver;
+    return {text:r.trim(), key:dateEl.value, dateStr:dateStr};
+  }
+
+  let lastReport=null;
+  const reportBox=$('reportBox');
+  $('generate').addEventListener('click',()=>{
+    lastReport=buildReport();
+    $('reportText').textContent=lastReport.text;
+    reportBox.classList.add('show');
+    reportBox.scrollIntoView({behavior:'smooth',block:'start'});
+    saveHistory(lastReport);
+  });
+
+  $('copyBtn').addEventListener('click',()=>{
+    if(!lastReport) return;
+    navigator.clipboard.writeText(lastReport.text).then(()=>{
+      const m=$('copiedMsg');m.classList.add('show');
+      setTimeout(()=>m.classList.remove('show'),2000);
+    }).catch(()=>{
+      // fallback
+      const ta=document.createElement('textarea');ta.value=lastReport.text;document.body.appendChild(ta);
+      ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);
+      const m=$('copiedMsg');m.classList.add('show');setTimeout(()=>m.classList.remove('show'),2000);
+    });
+  });
+
+  $('emailBtn').addEventListener('click',()=>{
+    if(!lastReport) return;
+    const to=$('emailYou').value.trim();
+    if(!to){
+      alert('Add at least one email address in the "Send report to" section first.');
+      return;
+    }
+    const subj=encodeURIComponent('Care report — '+lastReport.dateStr);
+    const body=encodeURIComponent(lastReport.text);
+    window.location.href='mailto:'+to+'?subject='+subj+'&body='+body;
+  });
+
+  $('reset').addEventListener('click',()=>{
+    if(!confirm('Clear all entries on this form?')) return;
+    document.querySelectorAll('textarea,input[type=text],input[type=number]').forEach(e=>{
+      if(e.id==='emailYou'||e.id==='recipient'||e.id==='caregiver') return;
+      e.value='';
+    });
+    document.querySelectorAll('select').forEach(e=>e.value='');
+    document.querySelectorAll('.seg button.on, .chip.on').forEach(e=>e.classList.remove('on'));
+    TASKS.forEach(t=>taskState[t]='');
+    moodSel.clear();actSel.clear();connectSel.clear();
+    setInc('no');
+    reportBox.classList.remove('show');
+    dateEl.value=fmtToday();updateShift();
+  });
+
+  // ---------- storage (persists in a downloaded/standalone file) ----------
+  const store={
+    set(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } },
+    get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+    keys(prefix){ const out=[]; try{ for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(key&&key.indexOf(prefix)===0) out.push(key);} }catch(e){} return out; }
+  };
+
+  // ---------- daily history ----------
+  const histList=$('histList');
+  function saveHistory(rep){
+    store.set('report:'+rep.key, JSON.stringify({text:rep.text,dateStr:rep.dateStr}));
+    loadHistory();
+  }
+  function loadHistory(){
+    const keys=store.keys('report:').sort().reverse();
+    if(!keys.length){
+      histList.innerHTML='<div class="emptyhist">Saved reports will appear here after you generate one.</div>';
+      return;
+    }
+    histList.innerHTML='';
+    keys.forEach(k=>{
+      let rec; try{ rec=JSON.parse(store.get(k)); }catch(e){ return; }
+      if(!rec) return;
+      const row=document.createElement('div'); row.className='histitem';
+      const hd=document.createElement('div'); hd.className='hd'; hd.textContent=rec.dateStr||k.replace('report:','');
+      const btn=document.createElement('button'); btn.textContent='View';
+      btn.addEventListener('click',()=>{
+        lastReport={text:rec.text,dateStr:rec.dateStr,key:k.replace('report:','')};
+        $('reportText').textContent=rec.text;
+        reportBox.classList.add('show');
+        reportBox.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      row.appendChild(hd); row.appendChild(btn); histList.appendChild(row);
+    });
+  }
+  loadHistory();
+
+  // ---------- persist recipients & names ----------
+  const CFG_FIELDS=['emailYou','recipient','caregiver'];
+  function loadConfig(){ CFG_FIELDS.forEach(id=>{ const v=store.get('cfg:'+id); if(v) $(id).value=v; }); }
+  CFG_FIELDS.forEach(id=>{ $(id).addEventListener('change',()=>{ store.set('cfg:'+id, $(id).value.trim()); }); });
+  loadConfig();
+})();
+</script>
+</body>
+</html>
