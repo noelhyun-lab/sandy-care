@@ -371,7 +371,7 @@
   </section>
 
   <div class="actions">
-    <button class="btn primary" id="generate">Generate report</button>
+    <button class="btn primary" id="generate">Send report</button>
     <button class="btn ghost" id="reset">Clear form</button>
   </div>
 
@@ -380,8 +380,9 @@
     <h3>Today's report</h3>
     <pre id="reportText"></pre>
     <div class="rowbtns">
+      <span id="sendStatus" style="font-weight:700;font-size:14px;align-self:center;margin-right:auto;"></span>
       <button class="btn ghost" id="copyBtn">Copy to clipboard</button>
-      <button class="btn ghost" id="emailBtn">Email report</button>
+      <button class="btn ghost" id="emailBtn">Email manually</button>
       <span class="copied" id="copiedMsg">Copied ✓</span>
     </div>
   </div>
@@ -602,12 +603,44 @@
 
   let lastReport=null;
   const reportBox=$('reportBox');
+
+  // One-tap send endpoint (your Apps Script web app).
+  const SEND_ENDPOINT="https://script.google.com/macros/s/AKfycbxjQQiLtdW0PspmEnh-LWN59-1zh_60NG6hxEqt3TZccLVw061aok2Mel1YN0gk2o5L/exec";
+
+  function openMailFallback(){
+    if(!lastReport) return;
+    const to=$('emailYou').value.trim()||'noelhyun@gmail.com';
+    const subj=encodeURIComponent('Care report — '+lastReport.dateStr);
+    const body=encodeURIComponent(lastReport.text);
+    window.location.href='mailto:'+to+'?subject='+subj+'&body='+body;
+  }
+
+  async function sendReport(){
+    const st=$('sendStatus');
+    st.style.color='#8a8a7a'; st.textContent='Sending…';
+    try{
+      const res=await fetch(SEND_ENDPOINT,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({dateStr:lastReport.dateStr,text:lastReport.text})
+      });
+      let ok=res.ok;
+      try{ const j=await res.json(); ok=!!j.ok; }catch(e){}
+      if(ok){ st.style.color='#5f6e51'; st.textContent='✓ Sent'; }
+      else{ throw new Error('send-failed'); }
+    }catch(e){
+      st.style.color='#b3492f'; st.textContent='Couldn’t auto-send — opening your email as backup';
+      openMailFallback();
+    }
+  }
+
   $('generate').addEventListener('click',()=>{
     lastReport=buildReport();
     $('reportText').textContent=lastReport.text;
     reportBox.classList.add('show');
     reportBox.scrollIntoView({behavior:'smooth',block:'start'});
     saveHistory(lastReport);
+    sendReport();
   });
 
   $('copyBtn').addEventListener('click',()=>{
@@ -625,14 +658,7 @@
 
   $('emailBtn').addEventListener('click',()=>{
     if(!lastReport) return;
-    const to=$('emailYou').value.trim();
-    if(!to){
-      alert('Add at least one email address in the "Send report to" section first.');
-      return;
-    }
-    const subj=encodeURIComponent('Care report — '+lastReport.dateStr);
-    const body=encodeURIComponent(lastReport.text);
-    window.location.href='mailto:'+to+'?subject='+subj+'&body='+body;
+    openMailFallback();
   });
 
   $('reset').addEventListener('click',()=>{
